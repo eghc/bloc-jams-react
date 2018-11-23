@@ -18,12 +18,14 @@ class Album extends Component{
       currentSong: album.songs[0],
       currentTime: 0,
       duration: album.songs[0].duration,
+      volume: 0.5,
       isPlaying: false,
       display: display
     };
 
     this.audioElement = document.createElement('audio');
     this.audioElement.src= album.songs[0].audioSrc;
+    this.audioElement.volume = 0.5;
   }
 
   play(){
@@ -108,10 +110,33 @@ class Album extends Component{
     this.play();
   }
 
+  //Q for mentor: are the next two functions redunant if there is eventListeners?
   handleTimeChange(e){
     const newTime = this.audioElement.duration * e.target.value;
     this.audioElement.currentTime = newTime;
     this.setState({currentTime: newTime});
+  }
+
+  handleVolumeChange(e){
+    //console.log(e.target.value);
+    this.audioElement.volume = e.target.value;
+    this.setState({volume: this.audioElement.volume});
+  }
+
+  formatTime(t){
+    if(t === undefined || t == null){
+      return;
+    }
+    let min = parseInt(t / 60);
+    if(min < 10){
+      min = "0" + String(min);
+    }
+    let sec = parseInt(t % 60);
+    if(sec < 10){
+      sec = "0" + String(sec);
+    }
+
+    return min + ":" + sec;
   }
 
   componentDidMount(){
@@ -121,10 +146,15 @@ class Album extends Component{
       },
       durationchange: e => {
          this.setState({duration: this.audioElement.duration});
+      },
+      volumechange: e =>{
+        this.setState({volume: this.audioElement.volume});
       }
+
     };
     this.audioElement.addEventListener('timeupdate', this.eventListeners.timeupdate);
     this.audioElement.addEventListener('durationchange', this.eventListeners.durationchange);
+    this.audioElement.addEventListener('volumechange', this.eventListeners.volumechange);
   }
 
   componentWillUnmount(){
@@ -166,12 +196,14 @@ class Album extends Component{
         </table>
         <PlayerBar isPlaying={this.state.isPlaying}
           currentSong = {this.state.currentSong}
-          currentTime = {this.audioElement.currentTime}
-          duration = {this.audioElement.duration}
+          currentTime = {this.formatTime(this.audioElement.currentTime)}
+          duration = {this.formatTime(this.audioElement.duration)}
+          volume = {this.state.volume}
           handleSongClick={() => this.handleSongClick(this.state.currentSong, this.state.album.songs.findIndex(song => this.state.currentSong === song))}
           handlePrevClick={() => this.handlePrevClick()}
           handleNextClick={() => this.handleNextClick()}
           handleTimeChange={(e) => this.handleTimeChange(e)}
+          handleVolumeChange={(e) => this.handleVolumeChange(e)}
         />
       </section>
     );
