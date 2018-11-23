@@ -8,10 +8,15 @@ class Album extends Component{
       return album.slug === this.props.match.params.slug
     });
 
+    let display = album.songs.map(song => song.duration);
+    //console.log(display);
+    //let display = new Array(album.songs.length).fill('play');
+
     this.state = {
       album: album,
       currentSong: album.songs[0],
-      isPlaying: false
+      isPlaying: false,
+      display: display
     };
 
     this.audioElement = document.createElement('audio');
@@ -24,23 +29,58 @@ class Album extends Component{
   }
   pause(){
     this.audioElement.pause();
-    this.setState({isPlayng: false});
+    this.setState({isPlaying: false});
   }
 
   setSong(song){
     this.audioElement.src = song.audioSrc;
     this.setState({currentSong:song});
   }
-  handleSongClick(song){
+  handleSongClick(song,index){
     const isSameSong = this.state.currentSong === song;
+    let display = this.state.display.slice();
     if(this.state.isPlaying && isSameSong){
       this.pause();
+      display[index] = 'play';
     }else{
+      console.log("else");
       if(!isSameSong){
+        //swtich songs
         this.setSong(song);
+        //reset all displays
+        display = this.state.album.songs.map(song => song.duration);
       }
       this.play();
+      display[index] = 'pause';
     }
+    this.setState({display:display});
+  }
+
+  handleSongHover(song,index){
+    const isSameSong = this.state.currentSong === song;
+    let display = this.state.display.slice();
+    if(isSameSong && this.state.isPlaying){
+      display[index] = 'pause';
+    }else{
+      display[index] = 'play';
+    }
+    this.setState({display:display});
+  }
+
+  handleSongLeave(song,index){
+    const isSameSong = this.state.currentSong === song;
+    let display = this.state.display.slice();
+    if(isSameSong){
+      if(this.state.isPlaying){
+        display[index] = 'pause';
+      }else{
+        display[index] ='play';
+      }
+    }else{
+      //display duration
+      display[index] = this.state.album.songs[index].duration;
+    }
+    this.setState({display:display});
   }
   render(){
     return(
@@ -59,10 +99,16 @@ class Album extends Component{
           </colgroup>
           <tbody>
           {this.state.album.songs.map((song,index) =>
-            <tr className="song" key={index} onClick = {() => this.handleSongClick(song)}>
+            <tr className="song" key={index} onMouseLeave={()=>this.handleSongLeave(song,index)} onMouseEnter={() => this.handleSongHover(song,index)} onClick = {() => this.handleSongClick(song, index)}>
               <td>{index+1}</td>
               <td>{song.title}</td>
-              <td>{song.duration}</td>
+
+              {this.state.display[index] !== 'play' && this.state.display[index] !== 'pause' ? (
+                <td>{this.state.display[index]}</td>
+                ):(
+                <td><ion-icon name={this.state.display[index]}></ion-icon></td>
+              )}
+
             </tr>
           )}
           </tbody>
