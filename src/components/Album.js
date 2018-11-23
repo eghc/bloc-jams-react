@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import albumData from './../data/album.js';
+import PlayerBar from './PlayerBar.js';
 
 class Album extends Component{
   constructor(props){
@@ -41,9 +42,9 @@ class Album extends Component{
     let display = this.state.display.slice();
     if(this.state.isPlaying && isSameSong){
       this.pause();
-      display[index] = 'play';
+      display[index] = 'icon ion-md-play';
     }else{
-      console.log("else");
+      //console.log("else");
       if(!isSameSong){
         //swtich songs
         this.setSong(song);
@@ -51,7 +52,7 @@ class Album extends Component{
         display = this.state.album.songs.map(song => song.duration);
       }
       this.play();
-      display[index] = 'pause';
+      display[index] = 'icon ion-md-pause';
     }
     this.setState({display:display});
   }
@@ -60,9 +61,9 @@ class Album extends Component{
     const isSameSong = this.state.currentSong === song;
     let display = this.state.display.slice();
     if(isSameSong && this.state.isPlaying){
-      display[index] = 'pause';
+      display[index] = 'icon ion-md-pause';
     }else{
-      display[index] = 'play';
+      display[index] = 'icon ion-md-play';
     }
     this.setState({display:display});
   }
@@ -72,9 +73,9 @@ class Album extends Component{
     let display = this.state.display.slice();
     if(isSameSong){
       if(this.state.isPlaying){
-        display[index] = 'pause';
+        display[index] = 'icon ion-md-pause';
       }else{
-        display[index] ='play';
+        display[index] ='icon ion-md-play';
       }
     }else{
       //display duration
@@ -82,6 +83,19 @@ class Album extends Component{
     }
     this.setState({display:display});
   }
+
+  handlePrevClick(){
+    const currentIndex = this.state.album.songs.findIndex(song => this.state.currentSong === song);
+    if(currentIndex === 0){
+      return;
+    }
+    const newIndex = Math.max(0, currentIndex -1);
+    const newSong = this.state.album.songs[newIndex];
+    this.handleSongClick(newSong, newIndex);
+    this.play();
+  }
+
+
   render(){
     return(
       <section className = "album">
@@ -103,16 +117,21 @@ class Album extends Component{
               <td>{index+1}</td>
               <td>{song.title}</td>
 
-              {this.state.display[index] !== 'play' && this.state.display[index] !== 'pause' ? (
+              {this.state.display[index].indexOf("icon") === -1 ? (
                 <td>{this.state.display[index]}</td>
                 ):(
-                <td><ion-icon name={this.state.display[index]}></ion-icon></td>
+                <td><span className={this.state.display[index]}></span></td>
               )}
 
             </tr>
           )}
           </tbody>
         </table>
+        <PlayerBar isPlaying={this.state.isPlaying}
+          currentSong = {this.state.currentSong}
+          handleSongClick={() => this.handleSongClick(this.state.currentSong, this.state.album.songs.findIndex(song => this.state.currentSong === song))}
+          handlePrevClick={() => this.handlePrevClick()}
+        />
       </section>
     );
   }
