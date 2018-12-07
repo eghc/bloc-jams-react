@@ -1,6 +1,29 @@
 import React, {Component} from 'react';
 import albumData from './../data/album.js';
 import PlayerBar from './PlayerBar.js';
+import Typography from '@material-ui/core/Typography';
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
+
+const styles = theme => ({
+  root: {
+    width: '70%',
+    marginTop: theme.spacing.unit * 3,
+    overflowX: 'auto',
+    justifyContent: 'center',
+    paddingBottom: 75,
+    marginLeft: '15%'
+  },
+  grow: {
+    flexGrow: 1,
+  },
+});
 
 class Album extends Component{
   constructor(props){
@@ -63,7 +86,7 @@ class Album extends Component{
 
   handleSongHover(song,index){
     const isSameSong = this.state.currentSong === song;
-    let display = this.state.display.slice();
+    let {display} = this.state;
     if(isSameSong && this.state.isPlaying){
       display[index] = 'icon ion-md-pause';
     }else{
@@ -74,7 +97,7 @@ class Album extends Component{
 
   handleSongLeave(song,index){
     const isSameSong = this.state.currentSong === song;
-    let display = this.state.display.slice();
+    let {display} = this.state;
     if(isSameSong){
       if(this.state.isPlaying){
         display[index] = 'icon ion-md-pause';
@@ -124,8 +147,8 @@ class Album extends Component{
   }
 
   formatTime(t){
-    if(t === undefined || t == null){
-      return;
+    if(t === undefined || t === null || isNaN(t)){
+      return "-:--";
     }
     let min = parseInt(t / 60);
     if(min < 10){
@@ -164,36 +187,35 @@ class Album extends Component{
   }
 
   render(){
+    const { classes } = this.props;
     return(
       <section className = "album">
         <section id ="album-info">
           <img id="album-cover-art" src={this.state.album.albumCover}/>
-          <h1 id ="album-title">{this.state.album.title}</h1>
-          <h2 className = "artist">{this.state.album.artist}</h2>
-          <div id="release-info">{this.state.album.releaseInfo}</div>
+          <Typography component="h2" variant="display2" gutterBottom>{this.state.album.title}</Typography>
+          <Typography component="h2" variant="display1" gutterBottom>{this.state.album.artist}</Typography>
+          <Typography variant="body1" gutterBottom>{this.state.album.releaseInfo}</Typography>
         </section>
-        <table id="song-list">
-          <colgroup>
-            <col id="song-number-column"/>
-            <col id="song-title-column"/>
-            <col id="song-duration-column"/>
-          </colgroup>
-          <tbody>
-          {this.state.album.songs.map((song,index) =>
-            <tr className="song" key={index} onMouseLeave={()=>this.handleSongLeave(song,index)} onMouseEnter={() => this.handleSongHover(song,index)} onClick = {() => this.handleSongClick(song, index)}>
-              <td>{index+1}</td>
-              <td>{song.title}</td>
 
-              {this.state.display[index].indexOf("icon") === -1 ? (
-                <td>{this.state.display[index]}</td>
-                ):(
-                <td><span className={this.state.display[index]}></span></td>
+        <Paper alignItems="center" justify="center" className={classes.root}>
+          <Table>
+            <TableBody>
+              {this.state.album.songs.map((song,index) =>
+                  <TableRow key={index} onMouseLeave={()=>this.handleSongLeave(song,index)}  onMouseEnter={() => this.handleSongHover(song,index)} onClick = {() => this.handleSongClick(song, index)}>
+                    <TableCell>
+                      {index+1}
+                    </TableCell>
+                    <TableCell>{song.title}</TableCell>
+                    {this.state.display[index].indexOf("icon") === -1 ? (
+                      <TableCell >{this.state.display[index]}</TableCell>
+                      ):(
+                      <TableCell><span className={this.state.display[index]}></span></TableCell>
+                    )}
+                  </TableRow>
               )}
-
-            </tr>
-          )}
-          </tbody>
-        </table>
+            </TableBody>
+          </Table>
+        </Paper>
         <PlayerBar isPlaying={this.state.isPlaying}
           currentSong = {this.state.currentSong}
           currentTime = {this.formatTime(this.audioElement.currentTime)}
@@ -209,5 +231,8 @@ class Album extends Component{
     );
   }
 }
+Album.propTypes = {
+  classes: PropTypes.object.isRequired,
+};
 
-export default Album;
+export default withStyles(styles)(Album);

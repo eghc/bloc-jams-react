@@ -1,20 +1,24 @@
 import React from 'react';
+import Typography from '@material-ui/core/Typography';
+
 
 const Landing = () => (
   <section className = "landing">
-    <h1 className ="hero-title">Turn the music up!</h1>
+    <Typography component="h2" variant="display3" color='primary' gutterBottom>
+         Turn the music up!
+    </Typography>
     <section className ="selling-points">
       <div className="point">
-        <h2 className="point-title">Choose your music</h2>
-        <p className="point-description">The world is full of music; why should you have to listen to music that someone else chose?</p>
+        <Typography component="h2" variant="display1" gutterBottom>Choose your music</Typography>
+        <Typography variant="body1" gutterBottom>The world is full of music; why should you have to listen to music that someone else chose?</Typography>
       </div>
       <div className="point">
-        <h2 className="point-title">Unlimited, streaming, ad-free</h2>
-        <p className="point-description">No arbitrary limits. No distractions.</p>
+      <Typography component="h2" variant="display1" gutterBottom>Unlimited, streaming, ad-free</Typography>
+        <Typography variant="body1" gutterBottom>No arbitrary limits. No distractions.</Typography>
       </div>
       <div className="point">
-      <h2 className="point-title">Mobile enabled</h2>
-      <p className="point-description">Listen to your music on the go. This streaming service is available on all mobile platforms.</p>
+      <Typography component="h2" variant="display1" gutterBottom>Mobile Enabled</Typography>
+      <Typography variant="body1" gutterBottom>Listen to your music on the go. This streaming service is available on all mobile platforms.</Typography>
       </div>
     </section>
   </section>
